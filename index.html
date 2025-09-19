@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ARG News </title>
+  <title>ARG News</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     * {
@@ -159,6 +159,23 @@
     .stat-card p {
       color: #666;
       font-size: 0.9rem;
+    }
+
+    /* Ad Section */
+    .ad-container {
+      display: none;
+      text-align: center;
+      margin-bottom: 30px;
+      background: rgba(255,255,255,0.95);
+      padding: 15px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .ad-container.show {
+      display: block;
     }
 
     /* News Grid */
@@ -336,6 +353,11 @@
       .news-grid {
         grid-template-columns: 1fr;
       }
+
+      .ad-container iframe {
+        width: 100% !important;
+        max-width: 320px;
+      }
     }
 
     /* Dark Mode */
@@ -389,6 +411,9 @@
         <i class="fas fa-moon"></i> Dark Mode
       </button>
     </div>
+
+    <!-- Ad Container -->
+    <div class="ad-container" id="adContainer"></div>
 
     <!-- Search & Filter -->
     <div class="search-filter">
@@ -472,6 +497,70 @@
       document.body.classList.add('dark-mode');
     }
 
+    // Ad configurations
+    const ads = [
+      {
+        key: '63718988f07bc6d276f3c6a441757cae',
+        format: 'iframe',
+        height: 90,
+        width: 728,
+        src: '//www.highperformanceformat.com/63718988f07bc6d276f3c6a441757cae/invoke.js'
+      },
+      {
+        key: 'c620af328467e6de19dc04af696ee0fb',
+        format: 'iframe',
+        height: 250,
+        width: 300,
+        src: '//www.highperformanceformat.com/c620af328467e6de19dc04af696ee0fb/invoke.js'
+      },
+      {
+        key: '78ade24182729fceea8e45203dad915b',
+        format: 'iframe',
+        height: 50,
+        width: 320,
+        src: '//www.highperformanceformat.com/78ade24182729fceea8e45203dad915b/invoke.js'
+      }
+    ];
+
+    // Function to load a random ad
+    function loadRandomAd() {
+      const adContainer = document.getElementById('adContainer');
+      adContainer.innerHTML = ''; // Clear previous ad
+
+      // Select a random ad
+      const randomAd = ads[Math.floor(Math.random() * ads.length)];
+
+      // Create ad script
+      const script1 = document.createElement('script');
+      script1.type = 'text/javascript';
+      script1.innerHTML = `
+        atOptions = {
+          'key': '${randomAd.key}',
+          'format': '${randomAd.format}',
+          'height': ${randomAd.height},
+          'width': ${randomAd.width},
+          'params': {}
+        };
+      `;
+
+      const script2 = document.createElement('script');
+      script2.type = 'text/javascript';
+      script2.src = randomAd.src;
+
+      adContainer.appendChild(script1);
+      adContainer.appendChild(script2);
+
+      // Check if ad loaded successfully
+      setTimeout(() => {
+        const iframe = adContainer.querySelector('iframe');
+        if (iframe && iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.innerHTML) {
+          adContainer.classList.add('show');
+        } else {
+          adContainer.classList.remove('show');
+        }
+      }, 2000); // Wait 2 seconds to check if ad loaded
+    }
+
     // Save news to Firebase
     async function saveNews(title, description, url, category = 'general') {
       const newsRef = ref(database, 'news');
@@ -517,6 +606,7 @@
       }
       
       document.getElementById('loading').style.display = 'none';
+      loadRandomAd(); // Load a new random ad after fetching news
     };
 
     // Clear all news
@@ -713,6 +803,7 @@
     // Initial load
     fetchAndSaveNews();
     updateStats();
+    loadRandomAd(); // Load initial ad
   </script>
 </body>
 </html>
