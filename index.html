@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI News Portal (GNews)</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7; }
+    h1 { text-align: center; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-bottom: 20px; }
+    .news-item { background: #fff; margin: 15px 0; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .news-item h3 { margin: 0 0 10px; color: #333; }
+    .news-item p { color: #555; }
+    .news-item a { color: blue; text-decoration: none; }
+    .news-item a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <h1>🔥 AR GNews </h1>
+  <button onclick="fetchAndSaveNews()">📰 নতুন নিউজ আনুন</button>
+  <hr>
+  <h2>Latest News</h2>
+  <div id="news"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
+    import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+
+    // ================= Firebase Config (New) =================
+    const firebaseConfig = {
+      apiKey: "AIzaSyBMLws4A6jrl8fIel2tLuPNXb7cOreiDyA",
+      authDomain: "news-cc238.firebaseapp.com",
+      projectId: "news-cc238",
+      storageBucket: "news-cc238.firebasestorage.app",
+      messagingSenderId: "1075965210208",
+      appId: "1:1075965210208:web:febffa562e3d318c0add05",
+      measurementId: "G-LW5JK2LDP6",
+      databaseURL: "https://news-cc238-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+
+    // Save news to Firebase
+    async function saveNews(title, description, url) {
+      const newsRef = ref(database, 'news');
+      await push(newsRef, {
+        title: title,
+        description: description,
+        url: url,
+        timestamp: Date.now()
+      });
+    }
+
+    // Fetch & Save GNews (via CORS proxy)
+    window.fetchAndSaveNews = async function() {
+      try {
+        const apiKey = "bd0260c6dfd59c1c411fdf0849f8db27"; // GNews API Key
+        const apiUrl = encodeURIComponent(`https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=5&apikey=${apiKey}`);
+        const proxyUrl = `https://api.allorigins.win/get?url=${apiUrl}`;
+
+        const res = await fetch(proxyUrl);
+        const dataText = await res.text();
+        const dataJson = JSON.parse(JSON.parse(dataText).contents);
+
+        if (dataJson.articles) {
+          dataJson.articles.forEach(article => {
+            saveNews(article.title, article.description, article.url);
+          });
+        }
+      } catch (error) {
+        console.error("❌ নিউজ আনতে সমস্যা:", error);
+      }
+    };
+
+    // Auto fetch every 5 minutes
+    setInterval(fetchAndSaveNews, 5 * 60 * 1000);
+
+    // Realtime display
+    const newsRef = ref(database, 'news');
+    onValue(newsRef, (snapshot) => {
+      const data = snapshot.val();
+      const newsDiv = document.getElementById("news");
+      newsDiv.innerHTML = "";
+
+      for (let id in data) {
+        const article = data[id];
+        newsDiv.innerHTML += `
+          <div class="news-item">
+            <h3>${article.title}</h3>
+            <p>${article.description || "No description"}</p>
+            <a href="${article.url}" target="_blank">Read More</a>
+          </div>
+        `;
+      }
+    });
+
+    // Initial fetch on load
+    fetchAndSaveNews();
+  </script>
+</body>
+</html>
