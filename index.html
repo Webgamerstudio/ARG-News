@@ -3,30 +3,451 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI News Portal (GNews)</title>
+  <title>ARG News </title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f7f7f7; }
-    h1 { text-align: center; }
-    button { padding: 10px 20px; font-size: 16px; cursor: pointer; margin-bottom: 20px; }
-    .news-item { background: #fff; margin: 15px 0; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-    .news-item h3 { margin: 0 0 10px; color: #333; }
-    .news-item p { color: #555; }
-    .news-item a { color: blue; text-decoration: none; }
-    .news-item a:hover { text-decoration: underline; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      background: rgba(255,255,255,0.1);
+      padding: 30px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      color: white;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.9);
+      font-size: 1.2rem;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 50px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+      color: white;
+      box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(45deg, #4ecdc4, #6dd5ed);
+      color: white;
+      box-shadow: 0 4px 15px rgba(78,205,196,0.4);
+    }
+
+    .btn-success {
+      background: linear-gradient(45deg, #55a3ff, #667eea);
+      color: white;
+      box-shadow: 0 4px 15px rgba(85,163,255,0.4);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+    }
+
+    /* Search & Filter */
+    .search-filter {
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .search-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+    }
+
+    .search-input, .filter-select {
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      min-width: 200px;
+    }
+
+    .search-input:focus, .filter-select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+    }
+
+    /* Stats */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+
+    .stat-card i {
+      font-size: 2rem;
+      color: #667eea;
+      margin-bottom: 10px;
+    }
+
+    .stat-card h3 {
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+      color: #333;
+    }
+
+    .stat-card p {
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    /* News Grid */
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+    }
+
+    .news-item {
+      background: rgba(255,255,255,0.95);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+      position: relative;
+    }
+
+    .news-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .news-item .image-placeholder {
+      height: 200px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 3rem;
+    }
+
+    .news-content {
+      padding: 25px;
+    }
+
+    .news-item h3 {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+      color: #333;
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-item p {
+      color: #666;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .news-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .news-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      border-radius: 20px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-read {
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      color: white;
+    }
+
+    .btn-bookmark {
+      background: #f8f9fa;
+      color: #666;
+      border: 1px solid #e0e0e0;
+    }
+
+    .btn-share {
+      background: #f8f9fa;
+      color: #666;
+      border: 1px solid #e0e0e0;
+    }
+
+    .btn-small:hover {
+      transform: translateY(-1px);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: white;
+      font-size: 1.2rem;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255,255,255,0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Toast Notifications */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      z-index: 1000;
+      transform: translateX(400px);
+      transition: transform 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateX(0);
+    }
+
+    .toast.success {
+      background: #4caf50;
+    }
+
+    .toast.error {
+      background: #f44336;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+      
+      .search-row {
+        flex-direction: column;
+      }
+      
+      .search-input, .filter-select {
+        width: 100%;
+        min-width: unset;
+      }
+      
+      .stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Dark Mode */
+    .dark-mode {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+    }
+
+    .bookmark-indicator {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #ffd700;
+      font-size: 1.2rem;
+    }
+
+    /* Animation */
+    .news-item {
+      animation: fadeInUp 0.6s ease forwards;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
   </style>
 </head>
 <body>
-  <h1>🔥 AR GNews </h1>
-  <button onclick="fetchAndSaveNews()">📰 নতুন নিউজ আনুন</button>
-  <hr>
-  <h2>Latest News</h2>
-  <div id="news"></div>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1><i class="fas fa-newspaper"></i> ARG News </h1>
+      <p>Stay Updated with Real-time Global News</p>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+      <button class="btn btn-primary" onclick="fetchAndSaveNews()">
+        <i class="fas fa-sync-alt"></i> Refresh News
+      </button>
+      <button class="btn btn-secondary" onclick="clearAllNews()">
+        <i class="fas fa-trash"></i> Clear All
+      </button>
+      <button class="btn btn-success" onclick="exportBookmarks()">
+        <i class="fas fa-download"></i> Export Bookmarks
+      </button>
+      <button class="btn btn-success" onclick="toggleDarkMode()">
+        <i class="fas fa-moon"></i> Dark Mode
+      </button>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="search-filter">
+      <div class="search-row">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search news..." onkeyup="filterNews()">
+        <select class="filter-select" id="categoryFilter" onchange="filterNews()">
+          <option value="">All Categories</option>
+          <option value="technology">Technology</option>
+          <option value="business">Business</option>
+          <option value="sports">Sports</option>
+          <option value="health">Health</option>
+          <option value="entertainment">Entertainment</option>
+        </select>
+        <select class="filter-select" id="sortFilter" onchange="filterNews()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="bookmarked">Bookmarked Only</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card">
+        <i class="fas fa-newspaper"></i>
+        <h3 id="totalNews">0</h3>
+        <p>Total News</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-bookmark"></i>
+        <h3 id="bookmarkedNews">0</h3>
+        <p>Bookmarked</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-clock"></i>
+        <h3 id="lastUpdate">--</h3>
+        <p>Last Updated</p>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-eye"></i>
+        <h3 id="readCount">0</h3>
+        <p>Articles Read</p>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading" style="display: none;">
+      <div class="spinner"></div>
+      <p>Fetching latest news...</p>
+    </div>
+
+    <!-- News Grid -->
+    <div class="news-grid" id="news"></div>
+  </div>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js';
-    import { getDatabase, ref, push, onValue } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
+    import { getDatabase, ref, push, onValue, remove } from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js';
 
-    // ================= Firebase Config (New) =================
     const firebaseConfig = {
       apiKey: "AIzaSyBMLws4A6jrl8fIel2tLuPNXb7cOreiDyA",
       authDomain: "news-cc238.firebaseapp.com",
@@ -41,22 +462,36 @@
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
 
+    let allNews = {};
+    let bookmarks = JSON.parse(localStorage.getItem('newsBookmarks') || '{}');
+    let readArticles = JSON.parse(localStorage.getItem('readArticles') || '{}');
+    let isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+    // Initialize dark mode
+    if (isDarkMode) {
+      document.body.classList.add('dark-mode');
+    }
+
     // Save news to Firebase
-    async function saveNews(title, description, url) {
+    async function saveNews(title, description, url, category = 'general') {
       const newsRef = ref(database, 'news');
       await push(newsRef, {
         title: title,
         description: description,
         url: url,
+        category: category,
         timestamp: Date.now()
       });
     }
 
-    // Fetch & Save GNews (via CORS proxy)
+    // Fetch & Save GNews
     window.fetchAndSaveNews = async function() {
+      document.getElementById('loading').style.display = 'block';
+      showToast('Fetching latest news...', 'info');
+      
       try {
-        const apiKey = "bd0260c6dfd59c1c411fdf0849f8db27"; // GNews API Key
-        const apiUrl = encodeURIComponent(`https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=5&apikey=${apiKey}`);
+        const apiKey = "bd0260c6dfd59c1c411fdf0849f8db27";
+        const apiUrl = encodeURIComponent(`https://gnews.io/api/v4/top-headlines?lang=en&country=us&max=10&apikey=${apiKey}`);
         const proxyUrl = `https://api.allorigins.win/get?url=${apiUrl}`;
 
         const res = await fetch(proxyUrl);
@@ -64,39 +499,220 @@
         const dataJson = JSON.parse(JSON.parse(dataText).contents);
 
         if (dataJson.articles) {
-          dataJson.articles.forEach(article => {
-            saveNews(article.title, article.description, article.url);
-          });
+          let saved = 0;
+          for (const article of dataJson.articles) {
+            await saveNews(
+              article.title, 
+              article.description, 
+              article.url,
+              detectCategory(article.title + ' ' + article.description)
+            );
+            saved++;
+          }
+          showToast(`${saved} new articles added!`, 'success');
         }
       } catch (error) {
-        console.error("❌ নিউজ আনতে সমস্যা:", error);
+        console.error("Error fetching news:", error);
+        showToast('Failed to fetch news. Please try again.', 'error');
+      }
+      
+      document.getElementById('loading').style.display = 'none';
+    };
+
+    // Clear all news
+    window.clearAllNews = function() {
+      if (confirm('Are you sure you want to clear all news?')) {
+        const newsRef = ref(database, 'news');
+        remove(newsRef).then(() => {
+          showToast('All news cleared!', 'success');
+        });
       }
     };
 
-    // Auto fetch every 5 minutes
-    setInterval(fetchAndSaveNews, 5 * 60 * 1000);
+    // Toggle bookmark
+    window.toggleBookmark = function(newsId) {
+      if (bookmarks[newsId]) {
+        delete bookmarks[newsId];
+      } else {
+        bookmarks[newsId] = true;
+      }
+      localStorage.setItem('newsBookmarks', JSON.stringify(bookmarks));
+      updateStats();
+      displayNews();
+    };
 
-    // Realtime display
-    const newsRef = ref(database, 'news');
-    onValue(newsRef, (snapshot) => {
-      const data = snapshot.val();
+    // Mark as read
+    window.markAsRead = function(newsId, url) {
+      readArticles[newsId] = Date.now();
+      localStorage.setItem('readArticles', JSON.stringify(readArticles));
+      updateStats();
+      window.open(url, '_blank');
+    };
+
+    // Share article
+    window.shareArticle = function(title, url) {
+      if (navigator.share) {
+        navigator.share({
+          title: title,
+          url: url
+        });
+      } else {
+        navigator.clipboard.writeText(url);
+        showToast('Link copied to clipboard!', 'success');
+      }
+    };
+
+    // Export bookmarks
+    window.exportBookmarks = function() {
+      const bookmarkedArticles = Object.keys(bookmarks).map(id => allNews[id]).filter(Boolean);
+      const data = JSON.stringify(bookmarkedArticles, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bookmarked-news.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('Bookmarks exported!', 'success');
+    };
+
+    // Toggle dark mode
+    window.toggleDarkMode = function() {
+      isDarkMode = !isDarkMode;
+      document.body.classList.toggle('dark-mode');
+      localStorage.setItem('darkMode', isDarkMode);
+      showToast(isDarkMode ? 'Dark mode enabled' : 'Dark mode disabled', 'success');
+    };
+
+    // Filter news
+    window.filterNews = function() {
+      displayNews();
+    };
+
+    // Detect category from content
+    function detectCategory(content) {
+      const text = content.toLowerCase();
+      if (text.includes('tech') || text.includes('ai') || text.includes('software')) return 'technology';
+      if (text.includes('business') || text.includes('market') || text.includes('economy')) return 'business';
+      if (text.includes('sports') || text.includes('football') || text.includes('basketball')) return 'sports';
+      if (text.includes('health') || text.includes('medical') || text.includes('covid')) return 'health';
+      if (text.includes('movie') || text.includes('music') || text.includes('celebrity')) return 'entertainment';
+      return 'general';
+    }
+
+    // Show toast notification
+    function showToast(message, type = 'info') {
+      const toast = document.createElement('div');
+      toast.className = `toast ${type} show`;
+      toast.textContent = message;
+      document.body.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => document.body.removeChild(toast), 300);
+      }, 3000);
+    }
+
+    // Update statistics
+    function updateStats() {
+      document.getElementById('totalNews').textContent = Object.keys(allNews).length;
+      document.getElementById('bookmarkedNews').textContent = Object.keys(bookmarks).length;
+      document.getElementById('readCount').textContent = Object.keys(readArticles).length;
+      
+      const lastUpdate = Math.max(...Object.values(allNews).map(n => n.timestamp || 0));
+      document.getElementById('lastUpdate').textContent = lastUpdate 
+        ? new Date(lastUpdate).toLocaleTimeString() 
+        : '--';
+    }
+
+    // Display news with filtering
+    function displayNews() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const categoryFilter = document.getElementById('categoryFilter').value;
+      const sortFilter = document.getElementById('sortFilter').value;
       const newsDiv = document.getElementById("news");
-      newsDiv.innerHTML = "";
 
-      for (let id in data) {
-        const article = data[id];
+      let filteredNews = Object.entries(allNews);
+
+      // Apply filters
+      if (searchTerm) {
+        filteredNews = filteredNews.filter(([id, article]) =>
+          article.title.toLowerCase().includes(searchTerm) ||
+          (article.description && article.description.toLowerCase().includes(searchTerm))
+        );
+      }
+
+      if (categoryFilter) {
+        filteredNews = filteredNews.filter(([id, article]) => 
+          article.category === categoryFilter
+        );
+      }
+
+      if (sortFilter === 'bookmarked') {
+        filteredNews = filteredNews.filter(([id]) => bookmarks[id]);
+      }
+
+      // Sort
+      filteredNews.sort(([idA, a], [idB, b]) => {
+        if (sortFilter === 'oldest') return (a.timestamp || 0) - (b.timestamp || 0);
+        return (b.timestamp || 0) - (a.timestamp || 0);
+      });
+
+      // Display
+      newsDiv.innerHTML = "";
+      filteredNews.forEach(([id, article], index) => {
+        const isBookmarked = bookmarks[id];
+        const isRead = readArticles[id];
+        
         newsDiv.innerHTML += `
-          <div class="news-item">
-            <h3>${article.title}</h3>
-            <p>${article.description || "No description"}</p>
-            <a href="${article.url}" target="_blank">Read More</a>
+          <div class="news-item" style="animation-delay: ${index * 0.1}s">
+            ${isBookmarked ? '<i class="fas fa-bookmark bookmark-indicator"></i>' : ''}
+            <div class="image-placeholder">
+              <i class="fas fa-newspaper"></i>
+            </div>
+            <div class="news-content">
+              <div class="news-meta">
+                <span><i class="fas fa-tag"></i> ${article.category || 'General'}</span>
+                <span><i class="fas fa-clock"></i> ${new Date(article.timestamp || 0).toLocaleDateString()}</span>
+              </div>
+              <h3 style="${isRead ? 'color: #999;' : ''}">${article.title}</h3>
+              <p>${article.description || "No description available"}</p>
+              <div class="news-actions">
+                <button class="btn-small btn-read" onclick="markAsRead('${id}', '${article.url}')">
+                  <i class="fas fa-external-link-alt"></i> Read
+                </button>
+                <button class="btn-small btn-bookmark" onclick="toggleBookmark('${id}')">
+                  <i class="fas fa-bookmark"></i> ${isBookmarked ? 'Saved' : 'Save'}
+                </button>
+                <button class="btn-small btn-share" onclick="shareArticle('${article.title}', '${article.url}')">
+                  <i class="fas fa-share"></i> Share
+                </button>
+              </div>
+            </div>
           </div>
         `;
+      });
+
+      if (filteredNews.length === 0) {
+        newsDiv.innerHTML = '<div class="loading"><p>No news found matching your criteria.</p></div>';
       }
+    }
+
+    // Auto fetch every 10 minutes
+    setInterval(fetchAndSaveNews, 10 * 60 * 1000);
+
+    // Realtime listener
+    const newsRef = ref(database, 'news');
+    onValue(newsRef, (snapshot) => {
+      const data = snapshot.val() || {};
+      allNews = data;
+      updateStats();
+      displayNews();
     });
 
-    // Initial fetch on load
+    // Initial load
     fetchAndSaveNews();
+    updateStats();
   </script>
 </body>
 </html>
